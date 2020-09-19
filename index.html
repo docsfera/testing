@@ -14,187 +14,22 @@
 </head>
 <body>
   <div id="threejs"></div>
-  <div style="width: 1000px; height: 1000px; background-color: black; position: absolute;
+  <div style="width: 100px; height: 100px; background-color: black; position: absolute;
     right: 0;
-    top: 0; opacity: 20%" id="fff"></div>
+    top: 0" id="fff"></div>
+
+  <script src="https://webglfundamentals.org/webgl/resources/m4.js"></script>  
   <script src='jss/three.js'></script>
   <script src="js/OBJLoader.js"></script>
   <!-- <script src="three/src/loaders/FontLoader.js"></script> -->
-  <script src="loaders/FontLoader.js"></script>
+  <script type="module" src="loaders/FontLoader.js"></script>
    <script src="loaders/Projector.js"></script>
    <script src="Raycaster.js"></script>
    
+   <script type="module" src="./myjs/MyObjects.js"></script>
   
   
-  <script>
-    const geometry = new THREE.TorusKnotGeometry(10, 1.3, 500, 6, 6, 20);
-    const geometry2 = new THREE.SphereGeometry( 20, 64, 64 );
-
-
-/** Elements that aren't the focus of the example */
-const scene = new THREE.Scene();
-
-scene.background = new THREE.Color(0x282c34);
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-document.getElementById('threejs').appendChild(renderer.domElement);
-
-var planeGeometry = new THREE.PlaneGeometry(window.innerWidth,window.innerHeight,1,1);
-var planeMaterial = new THREE.MeshBasicMaterial({color: 0xcccccc});
-var plane = new THREE.Mesh(planeGeometry,planeMaterial);
-plane.position.z = -10;
-scene.add(plane);
-
-
-const material = new THREE.MeshNormalMaterial();
-
-const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 15), material);
-const cylinder2 = new THREE.Mesh(new THREE.CylinderGeometry(5, 5, 15), material);
-
-
-/*cylinder.scale.x = 0.6;
-cylinder.scale.y = 0.2;
-cylinder.scale.z = 0.2;*/
-cylinder.position.set(100, 50, 0);
-cylinder2.position.set(130, 50, 0);
-
-scene.add(cylinder);
-scene.add(cylinder2);
-
-
-
-
-
-var gltfStore = {};
-/*let loader = new THREE.OBJLoader();
-loader.load('fdfadf111111111111111111111.obj', function(gltf){
-          const mesh3 = new THREE.Mesh(gltf.scene, material);
-
-          gltfStore.obj =  gltf;
-          gltf.children[0].material = material;
-
-          car = gltf;
-
-          renderer.render(scene, camera);
-          
-          scene.add(gltf);
-
-          return gltf;
-          animate();
-        });*/
-
-camera.position.z = 100;
-
-const frontSpot = new THREE.SpotLight(0xeeeece);
-frontSpot.position.set(1000, 1000, 1000);
-scene.add(frontSpot);
-
-const frontSpot2 = new THREE.SpotLight(0xddddce);
-scene.add(frontSpot2);
-
-objects = [];
-objects.push(cylinder);
-objects.push(cylinder2);
-
-projector = new THREE.Projector();
-
-
-var isclicked = false;
-var intersects;
-
-
-document.querySelector('html').addEventListener('mousedown', event => {
-	var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1,- ( event.clientY / window.innerHeight ) * 2 + 1,0.5 );
-	projector.unprojectVector( vector, camera );
-
-	var raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );
-	intersects = raycaster.intersectObjects( objects );
-	//isclicked = true;
-	if ( intersects.length> 0 ) // если массив не пуст
-	{
-		isclicked = true;
-		
-	}
-	//console.log(isclicked);
-})
-
-document.querySelector('html').addEventListener('mouseup', event => {
-	isclicked = false;
-})
-
-document.querySelector('html').addEventListener('mousemove', event => {
-	if(isclicked){
-
-		var vector = new THREE.Vector3(( event.clientX / window.innerWidth ) * 2 - 1,- ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-		projector.unprojectVector( vector, camera );
-		var raycaster = new THREE.Raycaster(camera.position, vector.sub( camera.position ).normalize() );
-		var intersects2 = raycaster.intersectObject( plane );
-
-		intersects[0].object.position.x =  intersects2[0].point.x;
-		intersects[0].object.position.y =  intersects2[0].point.y;
-		//console.log(intersects2[0]);
-	}
-})
-
-
-
-var fontloader = new THREE.FontLoader();
-
-
-
-fontloader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
-
-	var geometry = new THREE.TextGeometry( 'Sergay are gay', {
-		font: font,
-		size: 3,
-		height: 0,
-		curveSegments: 12,
-		bevelEnabled: true,
-		bevelThickness: 0,
-		bevelSize: 0,
-		bevelOffset: 0,
-		bevelSegments: 0
-	} );
-	var geometry2 = new THREE.TextGeometry( 'Volodya', {
-		font: font,
-		size: 3,
-		height: 0,
-		curveSegments: 12,
-		bevelEnabled: true,
-		bevelThickness: 0,
-		bevelSize: 0,
-		bevelOffset: 0,
-		bevelSegments: 0
-	} );
-
-	gggg = new THREE.Mesh(geometry,material);
-	gggg2 = new THREE.Mesh(geometry2,material);
-	gggg.position.set(100-15, 36, 0);
-	gggg2.position.set(100+22, 36-0.5, 0);
-	scene.add(gggg);
-	scene.add(gggg2);
-
-
-} );
-
-
-const animate = function () {
-  requestAnimationFrame(animate);
-
-  cylinder.rotation.x += 0.005;
-  cylinder.rotation.y += 0.005;
-  cylinder.rotation.z += 0.005;
-
-  cylinder2.rotation.x += 0.005;
-  cylinder2.rotation.y += 0.005;
-  cylinder2.rotation.z += 0.005;
-  renderer.render(scene, camera);
-};
-
-animate();
-  </script>
+  <script type="module" src="./myjs/MainFunction.js"></script>
 
   
 </body>
