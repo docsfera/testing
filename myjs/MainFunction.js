@@ -43,7 +43,7 @@ const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 50), material
 const cylinder2 = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 50), material);
 
 
-cylinder.position.set(1657/3  , 50, 0);
+cylinder.position.set(1677/3  , 50, 0);
 cylinder2.position.set(-550, 50, 0);
 
 scene.add(cylinder);
@@ -113,8 +113,14 @@ fontloader.load( 'fonts/helvetiker_regular.typeface.js', function ( font ) {
 } );
 
 
-var convecter = (px) => {
-	console.log('work')
+var convecterX = (gl, div, x) => {
+	let a = 1110 / gl.canvas.width;
+	return gl.canvas.width / 2 + 1/a * x - Number(div.style.width.split('px')[0]) / 2;
+}
+
+var convecterY = (gl, div, x) => {
+	let a = 255 * 2 / gl.canvas.height;
+	return gl.canvas.height / 2 - 1/a * x - Number(div.style.height.split('px')[0]) / 2;
 }
 
 
@@ -125,27 +131,32 @@ const animate = function () {
 		var canvas = document.querySelector("canvas");
 		var gl = canvas.getContext("webgl2");
 
-		//console.log(gl);
 		var div = document.getElementById('fff');
 
-		//console.log(Number(div.style.width.split('px')[0]) / 2)
 
-    	var pixelX = (1) * gl.canvas.width - Number(div.style.width.split('px')[0]) / 2;  //1657
-    	var pixelY = (0.4 * -0.5 + 0.5) * gl.canvas.height; // 0.4 * -0.5 + 0.5
+    	var pixelX = convecterX(gl, div, -555);
+    	var pixelY = convecterY(gl, div, 250);
 
 
     	div.style.left = Math.floor(pixelX) + "px";
     	div.style.top  = Math.floor(pixelY) + "px";
+
+    	cylinder.position.set(-400, 50, 0);
+		cylinder2.position.set(-555, 250, 0);
+
 	}
   requestAnimationFrame(animate);
 
-  cylinder.rotation.x += 0.005;
+  /*cylinder.rotation.x += 0.005;
   cylinder.rotation.y += 0.005;
   cylinder.rotation.z += 0.005;
 
   cylinder2.rotation.x += 0.005;
   cylinder2.rotation.y += 0.005;
-  cylinder2.rotation.z += 0.005;
+  cylinder2.rotation.z += 0.005;*/
+
+  
+
   renderer.render(scene, camera);
 };
 
