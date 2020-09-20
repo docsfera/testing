@@ -1,8 +1,23 @@
 import {ObjectMouseDown} from './MyObjects.js';
 	
+let CreateBox = () =>{
+	let textureBox = new THREE.ImageUtils.loadTexture( './cardboard-texture.jpg' );
+	let boxMaterial = new THREE.MeshPhongMaterial( { map: textureBox } );
+	let cube = new THREE.Mesh(new THREE.BoxGeometry(80, 80, 80), boxMaterial);
+	let cube2 = new THREE.Mesh(new THREE.BoxGeometry(90, 90, 90), boxMaterial);
+	cube2.position.x = 10;
+	let cube2BSP = new ThreeBSP(cube);
+	let cube1BSP = new ThreeBSP(cube2);
+	let resultBSP = cube1BSP.subtract(cube2BSP);
+	let result = resultBSP.toMesh(boxMaterial);
+    result.geometry.computeFaceNormals();
+    result.geometry.computeVertexNormals();
+    return result;
+}
 
 	
-
+	//var cube1BSP = new ThreeBSP(cube);
+	//sphere1BSP.subtract(sphere2BSP);
 
 	//alert('innerWidth: ' + window.innerWidth + 'innerHeight: ' + innerHeight);
     const geometry = new THREE.TorusKnotGeometry(10, 1.3, 500, 6, 6, 20);
@@ -27,14 +42,13 @@ import {ObjectMouseDown} from './MyObjects.js';
 
 
 	plane.position.z = -20;
-	//plane.rotation.z = 3.14;
+
 	scene.add(plane);
 
-
-
-
-
-
+	let box = CreateBox()
+	box.position.z = 40;
+    scene.add( box );
+  
 
 
 const material = new THREE.MeshNormalMaterial();
@@ -43,8 +57,8 @@ const cylinder = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 50), material
 const cylinder2 = new THREE.Mesh(new THREE.CylinderGeometry(25, 25, 50), material);
 
 
-cylinder.position.set(1677/3  , 50, 0);
-cylinder2.position.set(-550, 50, 0);
+cylinder.position.set(1677/3  , 50, 40);
+cylinder2.position.set(-550, 50, 40);
 
 scene.add(cylinder);
 scene.add(cylinder2);
@@ -141,7 +155,7 @@ const animate = function () {
     	div.style.left = Math.floor(pixelX) + "px";
     	div.style.top  = Math.floor(pixelY) + "px";
 
-    	cylinder.position.set(-400, 50, 0);
+    	cylinder.position.set(0, 0, 40);
 		cylinder2.position.set(-555, 250, 0);
 
 	}
@@ -155,6 +169,9 @@ const animate = function () {
   cylinder2.rotation.y += 0.005;
   cylinder2.rotation.z += 0.005;*/
 
+  	//result.rotation.x += 0.005;
+    box.rotation.y += 0.005;
+   // result.rotation.z += 0.005;
   
 
   renderer.render(scene, camera);
