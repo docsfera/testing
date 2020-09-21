@@ -1,15 +1,29 @@
-import {ObjectMouseDown} from './MyObjects.js';
+//import {ObjectMouseDown} from './MyObjects.js';
 	
 let CreateBox = () =>{
 	let textureBox = new THREE.ImageUtils.loadTexture( './cardboard-texture.jpg' );
 	let boxMaterial = new THREE.MeshPhongMaterial( { map: textureBox } );
-	let cube = new THREE.Mesh(new THREE.BoxGeometry(80, 80, 80), boxMaterial);
-	let cube2 = new THREE.Mesh(new THREE.BoxGeometry(90, 90, 90), boxMaterial);
+	let cube = new THREE.Mesh(new THREE.BoxGeometry(80, 80, 80), new THREE.MeshNormalMaterial() );
+	let cube2 = new THREE.Mesh(new THREE.BoxGeometry(90, 90, 90), new THREE.MeshNormalMaterial() );
 	cube2.position.x = 10;
 	let cube2BSP = new ThreeBSP(cube);
 	let cube1BSP = new ThreeBSP(cube2);
 	let resultBSP = cube1BSP.subtract(cube2BSP);
-	let result = resultBSP.toMesh(boxMaterial);
+
+	/*let gggg = new THREE.BoxGeometry(90, 90, 90);
+	console.log(gggg);
+	console.log(resultBSP.toGeometry());*/
+
+
+	let result = new Physijs.BoxMesh(resultBSP.toGeometry(), Physijs.createMaterial(new THREE.MeshPhongMaterial(
+	{
+		map: textureBox, 
+		transparent:true
+	})),0);
+
+	result.__dirtyRotation = true;
+
+	//let result = resultBSP.toMesh(boxMaterial);
     result.geometry.computeFaceNormals();
     result.geometry.computeVertexNormals();
     return result;
@@ -23,14 +37,29 @@ let CreateBox = () =>{
     const geometry = new THREE.TorusKnotGeometry(10, 1.3, 500, 6, 6, 20);
     const geometry2 = new THREE.SphereGeometry( 20, 64, 64 );
 
-	const scene = new THREE.Scene();
+	const scene = new Physijs.Scene({ reportsize: 50, fixedTimeStep: 1 / 20 }); // для работы rotation
+	/*scene.addEventListener( 'update', function() {
+    	// the scene's physics have finished updating
+	});*/
 
-	scene.background = new THREE.Color(0x282c34);
+	//scene.background = new THREE.Color(0x282c34);
+
+	// Try to add orbitcamera
+
 	const camera = new THREE.PerspectiveCamera(15, window.innerWidth / window.innerHeight, 0.1, 10000);
 
-	const renderer = new THREE.WebGLRenderer();
+	
+
+
+
+	const renderer = new THREE.WebGLRenderer({antialias: true}); // зачем?
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.getElementById('threejs').appendChild(renderer.domElement);
+
+	var orbitControls = new THREE.OrbitControls(camera, renderer.domElement);
+	orbitControls.autoRotate = true;
+	var clock = new THREE.Clock();
+
 
 
 
@@ -63,8 +92,38 @@ cylinder2.position.set(-550, 50, 40);
 scene.add(cylinder);
 scene.add(cylinder2);
 
+Physijs.scripts.worker = './js/physijs_worker.js';
+Physijs.scripts.ammo = './js/ammo.js';
 
+var stoneGeom = new THREE.CubeGeometry(6,6,2);
+var stone = new Physijs.BoxMesh(stoneGeom, Physijs.createMaterial(new THREE.MeshPhongMaterial(
+	{
+		color: 0xff0000,
+		transparent:true,
+		opacity:0.8
+	})),0);
 
+var stone2 = new Physijs.BoxMesh(stoneGeom, Physijs.createMaterial(new THREE.MeshPhongMaterial(
+	{
+		color: 0xff0000,
+		transparent:true,
+		opacity:0.8
+	})),5);
+
+stone2.position.x = 0;
+stone2.position.y = 240;
+stone2.position.z = 20;
+stone.position.x = 200;
+console.log(stone);
+stone.__dirtyRotation = true;
+stone2.__dirtyRotation = true;
+stone2.__dirtyPosition = true;
+stone.__dirtyPosition = true;
+console.log(stone.__dirtyPosition);
+scene.add(stone);
+scene.add(stone2);
+
+scene.setGravity(new THREE.Vector3(0, -15, 0));
 
 
 var gltfStore = {};
@@ -84,7 +143,7 @@ objects.push(cylinder);
 objects.push(cylinder2);
 
 
-ObjectMouseDown(camera, objects, plane);
+//ObjectMouseDown(camera, objects, plane);
 
 
 var fontloader = new THREE.FontLoader();
@@ -170,11 +229,26 @@ const animate = function () {
   cylinder2.rotation.z += 0.005;*/
 
   	//result.rotation.x += 0.005;
-    box.rotation.y += 0.005;
+
+  	var delta = clock.getDelta();
+	orbitControls.update(delta);
+
+  	box.__dirtyRotation = true;
+    box.rotation.z += -0.003;
+    stone.__dirtyPosition = true;
+    stone.__dirtyRotation = true;
+    stone.rotation.y += 0.095;
+
+    //stone2.__dirtyRotation = true;
+	//stone2.__dirtyPosition = true;
+
+    //console.log(stone.__dirtyPosition);
+    //console.log(box.rotation);
    // result.rotation.z += 0.005;
   
 
   renderer.render(scene, camera);
+  scene.simulate();
 };
 
 animate();
