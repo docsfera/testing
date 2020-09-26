@@ -28,7 +28,42 @@ let CreateBox = () =>{
     result.geometry.computeVertexNormals();
     return result;
 }
+let CreateBox2 = (x, y, wight, scene) =>{
+	let texture = new THREE.ImageUtils.loadTexture( './cardboard-texture.jpg' );
 
+	let CreatePhysics = (x, y, wight, texture) =>{
+		let result = new Physijs.BoxMesh(new THREE.BoxGeometry(x, y, wight), Physijs.createMaterial(new THREE.MeshPhongMaterial(
+				{
+					map: texture, 
+					transparent:true
+				})),0);
+		return result;
+	}
+
+	let size1 = CreatePhysics(x, y, wight, texture);
+	let size2 = CreatePhysics(x, x, wight, texture); // Нижнее основание
+	let size3 = CreatePhysics(x, y, wight, texture);
+	let size4 = CreatePhysics(x, y, wight, texture);
+	let size5 = CreatePhysics(x, y, wight, texture);
+
+	size2.rotation.x = Math.PI/2;
+	size2.position.set(0, -y/2, x/2);
+
+	size3.rotation.y = Math.PI/2;
+	size3.position.set(x/2, 0, x/2);
+
+	size4.rotation.y =  Math.PI/2;
+	size4.position.set(-x/2, 0, x/2);
+
+	size5.position.z = x;
+	
+	scene.add(size1);
+	scene.add(size2);
+	scene.add(size3);
+	scene.add(size4);
+	scene.add(size5);
+
+}
 	
 	//var cube1BSP = new ThreeBSP(cube);
 	//sphere1BSP.subtract(sphere2BSP);
@@ -76,7 +111,7 @@ let CreateBox = () =>{
 
 	let box = CreateBox()
 	box.position.z = 40;
-    scene.add( box );
+    ///scene.add( box );
   
 
 
@@ -91,6 +126,8 @@ cylinder2.position.set(-550, 50, 40);
 
 scene.add(cylinder);
 scene.add(cylinder2);
+CreateBox2(180, 100, 5, scene);
+
 
 Physijs.scripts.worker = './js/physijs_worker.js';
 Physijs.scripts.ammo = './js/ammo.js';
